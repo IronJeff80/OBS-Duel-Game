@@ -35,6 +35,9 @@ In the **Challenge** (`!duel`) action, there is an `If/Else` sub-action. This pr
 *   Change the target name to your actual Bot's username.
 *   *Alternatively: If you do not care if people duel your bot, you can simply disable or delete this sub-action.*
 
+### 6. Enable the Commands
+Commands are disabled when you import actions, so go to the Commands Page and enable both Duel Accept and Duel Challenge commands.
+
 ---
 
 ## 🇧🇷 Instalação em Português (PT-BR)
@@ -63,6 +66,8 @@ Na ação de **Desafio** (`!duelo`), há uma sub-ação `If/Else`. Ela serve par
 *   Altere o nome do alvo para o nome de usuário real do seu Bot.
 *   *Alternativa: Se você não se importa que os espectadores duelem com seu bot, basta desativar ou excluir essa sub-ação.*
 
+### 6. Ative os Comandos
+Os comandos são desativados quando você importa ações, portanto, vá para a Página de Comandos e ative os comandos Duelo Desafio e Duelo Acitar.
 ---
 
 ## ⚙️ WebSocket Port Configuration / Configuração de Porta WebSocket

@@ -16,9 +16,9 @@ Download `duel.rar` and extract all contents into a permanent folder on your PC 
 
 ### 2. OBS Setup
 *   Add a new **Browser Source** in your OBS scene.
-*   Check the box for **Local file** and select the `duel.html` file you just extracted.
+*   Check the box for **Local file** and select the `duelArena.html` file you just extracted.
 *   Set dimensions to **1920** (Width) x **1080** (Height).
-*   *(Optional)* Check **Control audio via OBS** if you want to mix the gunshot and music volumes directly in your OBS audio mixer.
+*   *(Optional)* Check **Control audio via OBS** if you want to mix the gunshot and music volumes directly in your OBS audio mixer (-18.5db is good).
 
 ### 3. Streamer.bot Import
 *   Open Streamer.bot and click the **Import** button at the top.

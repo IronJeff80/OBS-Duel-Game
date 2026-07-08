@@ -4,6 +4,7 @@ A fully automated, chat-triggered Western duel mini-game for your live stream. V
 
 This repository contains two versions:
 *   `duel.rar` (English)
+*   `duel-twitch-enUS.rar` (English and TWITCH)
 *   `duelo.rar` (Portuguese / PT-BR)
 
 ---

@@ -3,16 +3,16 @@
 A fully automated, chat-triggered Western duel mini-game for your live stream. Viewers can challenge each other in chat, triggering an interactive on-screen standoff in OBS complete with custom animations, dynamic avatars, randomized outcomes, and synchronized sound effects.
 
 This repository contains two versions:
-*   `duel.rar` (English)
-*   `duel-twitch-enUS.rar` (English and TWITCH)
-*   `duelo.rar` (Portuguese / PT-BR)
+*   `duel-youtube-enUS.rar` (English and YouTube)
+*   `duel-twitch-enUS.rar` (English and Twitch)
+*   `duelo-youtube-ptBR.rar` (Portuguese / PT-BR and YouTube)
 
 ---
 
 ## 🇺🇸 English Installation
 
 ### 1. Extract the Files
-Download `duel.rar` and extract all contents into a permanent folder on your PC where you keep your OBS assets. Ensure the `.html` file, fonts, audio files, and images all remain in the exact same folder.
+Download `duel-youtube-enUS.rar` or `duel-twitch-enUS.rar` and extract all contents into a permanent folder on your PC where you keep your OBS assets. Ensure the `.html` file, fonts, audio files, and images all remain in the exact same folder.
 
 ### 2. OBS Setup
 *   Add a new **Browser Source** in your OBS scene.
@@ -43,7 +43,7 @@ Commands are disabled by default when you import actions. Go to the **Commands**
 ## 🇧🇷 Instalação em Português (PT-BR)
 
 ### 1. Extrair os Arquivos
-Baixe o arquivo `duelo.rar` e extraia todo o conteúdo para uma pasta permanente no seu PC, onde você guarda os arquivos do seu OBS. Certifique-se de que o arquivo `.html`, as fontes, os áudios e as imagens fiquem na mesma pasta.
+Baixe o arquivo `duelo-youtube-ptBR.rar` e extraia todo o conteúdo para uma pasta permanente no seu PC, onde você guarda os arquivos do seu OBS. Certifique-se de que o arquivo `.html`, as fontes, os áudios e as imagens fiquem na mesma pasta.
 
 ### 2. Configuração no OBS
 *   Adicione uma nova **Fonte de Navegador** (Browser Source) na sua cena do OBS.

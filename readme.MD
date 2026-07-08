@@ -27,7 +27,7 @@ Download `duel.rar` and extract all contents into a permanent folder on your PC 
 ### 4. Compile the C# Scripts
 *   Navigate to the newly imported Duel actions.
 *   There are **3** "Execute C# Code" sub-actions in total across these actions. 
-*   Double-click each one, click the **Compile** button, wait for the "Compiled Successfully" message, and click **Save and Close**.
+*   Double-click each one, click the **Compile** button, wait for the "Compiled Successfully" message, and click **Save and Compile** or **OK**.
 
 ### 5. Bot Account Protection
 In the **Challenge** (`!duel`) action, there is an `If/Else` sub-action. This prevents viewers from triggering a duel against your automated bot account.

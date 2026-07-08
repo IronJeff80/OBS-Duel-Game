@@ -68,6 +68,7 @@ Na ação de **Desafio** (`!duelo`), há uma sub-ação `If/Else`. Ela serve par
 
 ### 6. Ativar os Comandos
 Os comandos vêm desativados por padrão quando você importa novas ações. Vá até a aba **Commands** no Streamer.bot, clique com o botão direito e ative os comandos de desafio e aceite do duelo.
+
 ---
 
 ## ⚙️ WebSocket Port Configuration / Configuração de Porta WebSocket

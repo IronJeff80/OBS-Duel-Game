@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RDR Duel Arena</title>
+    <script type="text/javascript" src="https://unpkg.com/@streamerbot/client/dist/streamerbot-client.js"></script>
+    <style>
+        @font-face {
+            font-family: 'RDR Lino';
+            src: url('RDRLINO-REGULAR.TTF') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            width: 1920px;
+            height: 1080px;
+            overflow: hidden; 
+            background: transparent;
+        }
+
+        #duel-arena {
+            position: absolute;
+            bottom: 40px;
+            width: 100%;
+            height: 450px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .player-wrapper {
+            position: absolute;
+            bottom: 0;
+            display: flex;
+            flex-direction: column; 
+            align-items: center;
+            gap: 15px;
+            transition: all 2s cubic-bezier(0.25, 1, 0.5, 1);
+            opacity: 0;
+        }
+
+        #player1 { left: -400px; }
+        #player2 { right: -400px; }
+
+        .stage-center-left { left: calc(50vw - 320px) !important; opacity: 1 !important; }
+        .stage-center-right { right: calc(50vw - 320px) !important; opacity: 1 !important; }
+        
+        .walk-off-left { left: 150px !important; opacity: 1 !important; }
+        .walk-off-right { right: 150px !important; opacity: 1 !important; }
+
+        .dead {
+            transform: rotate(-80deg) translateY(300px);
+            opacity: 0 !important;
+            transition: all 1.5s ease-in !important;
+        }
+
+        .name-tag {
+            width: 300px;
+            height: 60px; 
+            line-height: 54px; 
+            box-sizing: border-box;
+            text-align: center;
+            background: linear-gradient(to bottom, #8a0c0c, #4a0404);
+            border: 3px solid #2b1100;
+            border-radius: 4px; 
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.6), inset 0 0 10px rgba(0,0,0,0.5);
+            color: #f4e9d8; 
+            font-family: 'RDR Lino', "Georgia", serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding: 0 10px; 
+            white-space: nowrap;
+            overflow: hidden;
+            font-size: 2.2rem;
+        }
+
+        .avatar-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+        }
+
+        .profile-pic {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 8px solid #2b1100;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.8);
+            transition: transform 2s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .bullet-layer {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 10;
+        }
+
+        .bullet-hole {
+            position: absolute;
+            width: 80px; 
+            height: 80px;
+            opacity: 0;
+            transition: opacity 0.1s; 
+        }
+    </style>
+</head>
+<body>
+
+    <div id="duel-arena">
+        <div id="player1" class="player-wrapper">
+            <div class="name-tag" id="p1-name"></div>
+            <div class="avatar-container">
+                <img class="profile-pic" id="p1-pic" src="">
+                <div class="bullet-layer" id="p1-bullets"></div>
+            </div>
+        </div>
+
+        <div id="player2" class="player-wrapper">
+            <div class="name-tag" id="p2-name"></div>
+            <div class="avatar-container">
+                <img class="profile-pic" id="p2-pic" src="">
+                <div class="bullet-layer" id="p2-bullets"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        // =================================================================
+        // ⚙️ AUDIO & TIMING CONFIGURATION
+        // =================================================================
+        const bulletTimings = [
+            0,     // Bullet 1 Impact Time
+            400,   // Bullet 2 Impact Time
+            700,   // Bullet 3 Impact Time
+            1200,  // Bullet 4 Impact Time
+            1300,  // Bullet 5 Impact Time
+            1600   // Bullet 6 Impact Time
+        ];
+
+        const completeAudioDelay = 2000; 
+        // =================================================================
+
+        const client = new StreamerbotClient({ port: 8080 });
+        const trackedGlobal = "DuelAnimationData";
+
+        client.on('Misc.GlobalVariableUpdated', (data) => {
+            if (data.data.name === trackedGlobal) {
+                const payload = JSON.parse(data.data.newValue);
+                
+                if (payload.state === "challenge") {
+                    startChallenge(payload);
+                } else if (payload.state === "cancel") {
+                    cancelDuel();
+                } else if (payload.state === "accept") {
+                    acceptDuel(payload);
+                } else if (payload.state === "result") {
+                    showResult(payload);
+                }
+            }
+        });
+
+        function scaleTextToFit(element) {
+            element.style.fontSize = '2.2rem';
+            let currentSize = 2.2;
+            while (element.scrollWidth > element.clientWidth && currentSize > 0.5) {
+                currentSize -= 0.1;
+                element.style.fontSize = currentSize + 'rem';
+            }
+        }
+
+        function startChallenge(data) {
+            let challengeAudio = new Audio('duelchallenge.mp3');
+            challengeAudio.volume = 1.0;
+            challengeAudio.play().catch(e => console.log("Audio blocked by browser:", e));
+
+            const p1 = document.getElementById('player1');
+            const pic1 = document.getElementById('p1-pic');
+
+            p1.className = 'player-wrapper';
+            document.getElementById('p1-bullets').innerHTML = "";
+            document.getElementById('p2-bullets').innerHTML = "";
+            
+            pic1.style.transform = 'rotate(-720deg)';
+
+            document.getElementById('p1-name').innerText = data.challenger;
+            pic1.src = data.challengerAvatar;
+
+            setTimeout(() => { scaleTextToFit(document.getElementById('p1-name')); }, 10);
+
+            setTimeout(() => {
+                p1.classList.add('stage-center-left');
+                pic1.style.transform = 'rotate(0deg)';
+            }, 100);
+        }
+
+        function cancelDuel() {
+            const p1 = document.getElementById('player1');
+            const pic1 = document.getElementById('p1-pic');
+            
+            p1.classList.remove('stage-center-left');
+            pic1.style.transform = 'rotate(-720deg)';
+        }
+
+        function acceptDuel(data) {
+            const p1 = document.getElementById('player1');
+            const p2 = document.getElementById('player2');
+            const pic1 = document.getElementById('p1-pic');
+            const pic2 = document.getElementById('p2-pic');
+
+            let standoffAudio = new Audio('standoff.mp3');
+            standoffAudio.volume = 1.0; 
+            standoffAudio.play().catch(e => console.log("Audio blocked by browser:", e));
+
+            p2.className = 'player-wrapper';
+            pic2.style.transform = 'rotate(720deg)';
+
+            document.getElementById('p2-name').innerText = data.target;
+            pic2.src = data.targetAvatar;
+
+            setTimeout(() => { scaleTextToFit(document.getElementById('p2-name')); }, 10);
+
+            setTimeout(() => {
+                p2.classList.add('stage-center-right');
+                pic2.style.transform = 'rotate(0deg)';
+            }, 100);
+
+            setTimeout(() => {
+                p1.classList.replace('stage-center-left', 'walk-off-left');
+                p2.classList.replace('stage-center-right', 'walk-off-right');
+                
+                pic1.style.transform = 'rotate(-360deg)';
+                pic2.style.transform = 'rotate(360deg)';
+            }, 2000); 
+        }
+
+        function showResult(data) {
+            // FIXED TIE LOGIC: Both players roll out in opposite directions
+            if (data.loser === 'tie') {
+                setTimeout(() => {
+                    const p1 = document.getElementById('player1');
+                    const p2 = document.getElementById('player2');
+                    const pic1 = document.getElementById('p1-pic');
+                    const pic2 = document.getElementById('p2-pic');
+
+                    // Remove positional classes to slide off screen
+                    p1.className = 'player-wrapper';
+                    p2.className = 'player-wrapper';
+                    
+                    // Roll them backward off screen
+                    pic1.style.transform = 'rotate(-720deg)';
+                    pic2.style.transform = 'rotate(720deg)';
+                }, 3000); // 3 seconds after tie result
+
+                setTimeout(clearArena, 6000);
+                return;
+            }
+
+            let shotsAudio = new Audio('duelshots.mp3');
+            shotsAudio.volume = 1.0;
+            shotsAudio.play().catch(e => console.log("Audio blocked by browser:", e));
+
+            const p1Name = document.getElementById('p1-name').textContent.trim().toLowerCase();
+            const loserName = data.loser.trim().toLowerCase();
+            const isP1Loser = (loserName === p1Name);
+            
+            const loserWrapper = document.getElementById(isP1Loser ? 'player1' : 'player2');
+            const loserBulletLayer = document.getElementById(isP1Loser ? 'p1-bullets' : 'p2-bullets');
+            
+            const winnerWrapper = document.getElementById(isP1Loser ? 'player2' : 'player1');
+            const winnerPic = document.getElementById(isP1Loser ? 'p2-pic' : 'p1-pic');
+
+            for (let i = 1; i <= 6; i++) {
+                let img = document.createElement('img');
+                img.src = `bullethole${i}.png`;
+                img.className = 'bullet-hole';
+                
+                const topPos = Math.floor(Math.random() * 60) + 10;  
+                const leftPos = Math.floor(Math.random() * 60) + 10; 
+                const randomRot = Math.floor(Math.random() * 360);
+                
+                img.style.top = `${topPos}%`;
+                img.style.left = `${leftPos}%`;
+                img.style.transform = `rotate(${randomRot}deg)`;
+                
+                loserBulletLayer.appendChild(img);
+                
+                const impactDelay = bulletTimings[i - 1];
+                setTimeout(() => { img.style.opacity = '1'; }, impactDelay);
+            }
+            
+            const finalBulletTime = bulletTimings[5]; 
+            
+            setTimeout(() => {
+                loserWrapper.classList.add('dead');
+            }, finalBulletTime + 250); 
+
+            setTimeout(() => {
+                let completeAudio = new Audio('duelcomplete.mp3');
+                completeAudio.volume = 1.0;
+                completeAudio.play().catch(e => console.log("Audio blocked by browser:", e));
+            }, finalBulletTime + completeAudioDelay);
+
+            setTimeout(() => {
+                winnerWrapper.className = 'player-wrapper';
+                
+                if (isP1Loser) {
+                    winnerPic.style.transform = 'rotate(720deg)';
+                } else {
+                    winnerPic.style.transform = 'rotate(-720deg)';
+                }
+            }, finalBulletTime + 7000);
+
+            setTimeout(clearArena, finalBulletTime + 10000);
+        }
+
+        function clearArena() {
+            document.getElementById('player1').style.opacity = '0';
+            document.getElementById('player2').style.opacity = '0';
+        }
+    </script>
+</body>
+</html>
